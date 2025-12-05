@@ -36,12 +36,13 @@ app.use(session({
 }));
 
 // Static files
-app.use(express.static(path.join(__dirname, 'MinDisApp2025', 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Basic routes
+// Root route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 
 app.get('/health', (req, res) => {
   res.json({ 
