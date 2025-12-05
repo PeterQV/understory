@@ -1,4 +1,4 @@
-const users = require('../db/brugere'); // jeres array med brugere
+const users = require('../../db/brugere'); // jeres array med brugere
 const bcrypt = require('bcryptjs');
 
 const authController = {
