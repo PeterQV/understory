@@ -33,38 +33,31 @@ app.use(session({
   }
 }));
 
-// Static files - PUBLIC mappen (uden login)
-app.use(express.static(path.join(__dirname, 'MinDisApp2025', 'public')));
+// 🔴 VIGTIGT: Definer PUBLIC mappe KORREKT
+const publicDir = path.join(__dirname, 'MinDisApp2025', 'public');
+console.log(`Serving static files from: ${publicDir}`);
 
-// Root route
+// Static files
+app.use(express.static(publicDir));
+
+// Root route - index.html
 app.get('/', (req, res) => {
   if (req.session.user) {
-    // Hvis bruger er logget ind, redirect til beskyttet forside
     return res.redirect('/forside');
   }
-  // Hvis ikke logget ind, vis index.html (login side)
-  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'public', 'index.html'));
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-// Login route
+// Login route - login.html
 app.get('/login', (req, res) => {
   if (req.session.user) {
-    // Hvis allerede logget ind, redirect til forside
     return res.redirect('/forside');
   }
-  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'public', 'login.html'));
+  res.sendFile(path.join(publicDir, 'login.html'));
 });
 
 // 🔴 BESKYTTET: Forside (kræver login)
 app.get('/forside', (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'protected', 'forside.html'));
-});
-
-// 🔴 BESKYTTET: Forside.html (alternativ URL)
-app.get('/forside.html', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
   }
@@ -87,12 +80,42 @@ app.use('/users', usersRouter);
 
 // 404 handler
 app.use(function(req, res, next) {
+  // Hvis det er en HTML fil, prøv at sende den som fil
+  if (req.path.endsWith('.html')) {
+    const possiblePaths = [
+      path.join(publicDir, req.path),
+      path.join(publicDir, req.path.replace(/^\//, '')),
+      path.join(__dirname, 'MinDisApp2025', 'public', req.path),
+      path.join(__dirname, 'MinDisApp2025', 'public', req.path.replace(/^\//, ''))
+    ];
+    
+    for (const filePath of possiblePaths) {
+      try {
+        if (require('fs').existsSync(filePath)) {
+          return res.sendFile(filePath);
+        }
+      } catch (err) {
+        continue;
+      }
+    }
+  }
+  
   next(createError(404));
 });
 
 // Error handler
 app.use(function(err, req, res, next) {
-  console.error(err);
+  console.error('Error:', err.message);
+  console.error('Path:', req.path);
+  
+  // Hvis 404, redirect til login eller send besked
+  if (err.status === 404) {
+    if (req.path === '/forside') {
+      return res.redirect('/login');
+    }
+    return res.status(404).send('Side ikke fundet: ' + req.path);
+  }
+  
   res.status(err.status || 500).json({
     error: err.message,
     status: err.status || 500
@@ -103,6 +126,8 @@ app.use(function(err, req, res, next) {
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Public directory: ${publicDir}`);
+  console.log(`Protected directory: ${path.join(__dirname, 'MinDisApp2025', 'protected')}`);
 });
 
 module.exports = app;
