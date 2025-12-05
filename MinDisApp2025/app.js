@@ -52,14 +52,14 @@ app.get('/forside.html', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login.html');
   }
-  res.sendFile(path.join(__dirname,'protected', 'forside.html'));
+  res.sendFile(path.join(__dirname, 'protected', 'forside.html'));
 });
 
 app.get('/forside', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login.html');
   }
-  res.sendFile(path.join(__dirname,'protected', 'forside.html'));
+  res.sendFile(path.join(__dirname, 'protected', 'forside.html'));
 });
 
 // 🔴 ROUTE FOR RODEN (/)
