@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var users = require('../db/brugere');
+const express = require('express');
+const router = express.Router();
+const users = require('../db/brugere');
 
 /* GET brugere ud fra brugernavn */
 router.get('/:username', async (req, res) => {
@@ -19,6 +19,11 @@ router.post('/create', async (req, res) => {
   const newUser = req.body;
   users.push(newUser);
   res.status(201).json(newUser);
+});
+
+/* GET alle brugere (kun username og email) */
+router.get('/', (req, res) => {
+  res.json(users.map(u => ({ username: u.username, email: u.email })));
 });
 
 /* PUT opdater bruger ud fra brugernavn */
