@@ -1,16 +1,13 @@
-const bcrypt = require('bcryptjs');
-console.log(bcrypt.hashSync('12345', 12));  // Kopier denne hash
-console.log(bcrypt.hashSync('p54321', 12)); // Kopier denne hash
-
+// db/brugere.js
 const users = [
     {
         username: "fang2301",
-        password: "12345",
+        password: "$2b$12$0.cT/e.oNOybYfJDhsljdeFzHCL9Bi676f/HL1OI/6tGAqu3csigG",
         email: "alzifa633@gmail.com"
     },
     {
         username: "caro234",
-        password: "p54321",
+        password: "$2b$12$OpIVxqB5Em9bS98qASTjq.6vhtFDbv6/PP6V7cEA/MuWhwt/7QKUG",
         email: "ziyundk@hotmail.com"
     }
 ]
