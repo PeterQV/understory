@@ -47,6 +47,30 @@ app.get('/auth/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+// 🔴 BESKYTTEDE ROUTES
+app.get('/forside.html', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login.html');
+  }
+  res.sendFile(path.join(__dirname, 'disprojekt2025','protected', 'forside.html'));
+});
+
+app.get('/forside', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login.html');
+  }
+  res.sendFile(path.join(__dirname, 'disprojekt2025','protected', 'forside.html'));
+});
+
+// 🔴 ROUTE FOR RODEN (/)
+app.get('/', (req, res) => {
+  if (req.session.user) {
+    return res.redirect('/forside');
+  }
+  res.sendFile(path.join(__dirname, 'disprojekt2025', 'public', 'index.html'));
+});
+
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
