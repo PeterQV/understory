@@ -30,7 +30,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // Sæt til true når du har HTTPS
+    secure: true, // Sæt til true når du har HTTPS
     maxAge: 30 * 60 * 1000
   }
 }));
@@ -39,9 +39,9 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Root route
-app.get('/', (req, res) => {
+/*app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+});*/
 
 app.get('/auth/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
