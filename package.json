@@ -7,14 +7,18 @@
   },
 
   "dependencies": {
-    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
+    "axios": "^1.13.2",
+    "connect-redis": "^9.0.0",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.2",
-    "morgan": "^1.10.1"
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.1",
+    "redis": "^5.10.0"
   }
 
 }

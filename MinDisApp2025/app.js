@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var rateLimit = require('express-rate-limit');
 var { RedisStore } = require('connect-redis');
-require('dotenv').config();
+
 
 
 // Rate limiting
@@ -24,7 +24,6 @@ var usersRouter = require('./routes/users');
 var session = require('express-session');
 var authRouter = require('./routes/auth');
 var chatRouter = require('./routes/deepseek');
-require('dotenv').config();
 var app = express();
 
 // Trust proxy for HTTPS
