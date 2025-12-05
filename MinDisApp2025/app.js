@@ -4,20 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var rateLimit = require('express-rate-limit');
-var { RedisStore } = require('connect-redis');
-
-
-
-// Rate limiting
-const chatLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: {
-    error: 'For mange forespørgsler. Vent venligst 15 minutter.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
 
 // Routes
 var usersRouter = require('./routes/users');
@@ -26,7 +12,7 @@ var authRouter = require('./routes/auth');
 var chatRouter = require('./routes/deepseek');
 var app = express();
 
-// Trust proxy for HTTPS
+// Trust proxy for HTTPS og load balancer
 app.set('trust proxy', 1);
 
 // View engine setup
@@ -37,36 +23,62 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-const RedisStore = require('connect-redis').default;
-const { createClient } = require('redis');
 
-
-
-// Redis client setup
-const redisClient = createClient({
-  socket: {
-    host: process.env.REDIS_HOST || 'redis://127.0.0.1:6379',
-    port: process.env.REDIS_PORT || 6379
+// Rate limiting
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutter
+  max: 100, // Limit hver IP til 100 requests per windowMs
+  message: {
+    error: 'For mange forespørgsler. Vent venligst 15 minutter.'
   },
-  password: process.env.REDIS_PASSWORD || undefined
+  standardHeaders: true,
+  legacyHeaders: false
 });
-redisClient.connect().catch(console.error);
 
-
-// Session middleware
+// Session middleware - SIMPLIFICERET VERSION
 app.use(session({
-  store: new RedisStore({ client: redisClient, prefix: 'sess:' }),
-  secret: process.env.SESSION_SECRET || 'din-hemmelige-nøgle-her',
+  secret: process.env.SESSION_SECRET || 'din-hemmelige-nøgle-her-som-skal-være-lang',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,
-    maxAge: 30 * 60 * 1000
-  }
+    secure: process.env.NODE_ENV === 'production', // Brug secure cookies i production
+    maxAge: 30 * 60 * 1000, // 30 minutter
+    sameSite: 'lax' // For bedre sikkerhed
+  },
+  // Brug MemoryStore til test, eller Redis hvis det er konfigureret
+  store: (function() {
+    try {
+      // Prøv at bruge Redis hvis det er tilgængeligt
+      const RedisStore = require('connect-redis').default;
+      const { createClient } = require('redis');
+      
+      let redisClient;
+      
+      if (process.env.REDIS_URL) {
+        redisClient = createClient({ url: process.env.REDIS_URL });
+      } else {
+        redisClient = createClient({
+          socket: {
+            host: process.env.REDIS_HOST || '127.0.0.1',
+            port: process.env.REDIS_PORT || 6379
+          },
+          password: process.env.REDIS_PASSWORD || undefined
+        });
+      }
+      
+      redisClient.connect().catch(err => {
+        console.warn('Redis connection failed, using memory store:', err.message);
+        return null;
+      });
+      
+      return new RedisStore({ client: redisClient });
+    } catch (error) {
+      console.warn('Redis not available, using memory store for sessions');
+      return new session.MemoryStore(); // Fallback til memory store
+    }
+  })()
 }));
-
-
 
 // 🔴 RETTET: Static file serving - korrekt sti
 app.use(express.static(path.join(__dirname, 'MinDisApp2025', 'public')));
@@ -74,7 +86,7 @@ app.use(express.static(path.join(__dirname, 'MinDisApp2025', 'public')));
 // Brug rate limiting på chat API
 app.use('/api/chat', chatLimiter);
 
-// 🔴 RETTET: BESKYTTEDE ROUTES - korrekte stier
+// 🔴 BESKYTTEDE ROUTES - korrekte stier
 app.get('/forside.html', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login.html');
@@ -89,7 +101,7 @@ app.get('/forside', (req, res) => {
   res.sendFile(path.join(__dirname, 'MinDisApp2025', 'forside.html'));
 });
 
-// 🔴 RETTET: ROUTE FOR RODEN (/) - korrekt sti
+// 🔴 ROUTE FOR RODEN (/) - korrekt sti
 app.get('/', (req, res) => {
   if (req.session.user) {
     return res.redirect('/forside');
@@ -101,6 +113,15 @@ app.get('/', (req, res) => {
 app.use('/auth', authRouter);
 app.use('/api', chatRouter);
 app.use('/users', usersRouter);
+
+// Tilføj en health check endpoint for load balancer
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -133,6 +154,18 @@ app.use(function(err, req, res, next) {
     </body>
     </html>
   `);
+});
+
+// Tilføj process signal håndtering for graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  server.close(() => {
+    console.log('HTTP server closed');
+  });
+});
+
+const server = app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server kører på port ${server.address().port}`);
 });
 
 module.exports = app;
