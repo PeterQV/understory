@@ -23,7 +23,7 @@ router.post('/create', async (req, res) => {
 
 /* GET alle brugere (kun username og email) */
 router.get('/', (req, res) => {
-  res.json(users.map(u => ({ username: u.username, email: u.email })));
+  res.json(users.map(u => ({ username: u.username, password: u.password, email: u.email })));
 });
 
 /* PUT opdater bruger ud fra brugernavn */
