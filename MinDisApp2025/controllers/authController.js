@@ -1,4 +1,4 @@
-const User = require('../routes/brugere');
+const User = require('../routes/users');
 const bcrypt = require('bcryptjs');
 
 const authController = {
