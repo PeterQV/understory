@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
+// i app.js eller bin/www
+require('dotenv').config();
+
 
 // Routes
 var usersRouter = require('./routes/users');
