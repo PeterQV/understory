@@ -22,7 +22,7 @@ router.post('/create', async (req, res) => {
 });
 
 /* PUT opdater bruger ud fra brugernavn */
-router.put('/update/:username', async (req, res) => {
+/*router.put('/update/:username', async (req, res) => {
     const username = req.params.username;
     const updatedData = req.body;
     const userIndex = users.findIndex((u) => u.username === username);
@@ -34,9 +34,9 @@ router.put('/update/:username', async (req, res) => {
     users[userIndex] = { ...users[userIndex], ...updatedData };
     res.json(users[userIndex]);
 });
-
+*/
 /* DELETE slet bruger ud fra brugernavn */
-router.delete('/delete/:username', async (req, res) => {
+/*router.delete('/delete/:username', async (req, res) => {
     const username = req.params.username;
     const userIndex = users.findIndex((u) => u.username === username);
 
@@ -47,5 +47,5 @@ router.delete('/delete/:username', async (req, res) => {
     users.splice(userIndex, 1);
     res.json({ message: 'User deleted!' });
 });
-
+*/
 module.exports = router;
