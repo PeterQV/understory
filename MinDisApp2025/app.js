@@ -4,9 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
-// i app.js eller bin/www
 require('dotenv').config();
-
 
 // Routes
 var usersRouter = require('./routes/users');
@@ -23,53 +21,55 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Simple session - uden Redis (for nu)
+// Simple session
 app.use(session({
   secret: process.env.SESSION_SECRET || 'default-secret-change-me',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // Sæt til true når du har HTTPS
+    secure: false,
     maxAge: 30 * 60 * 1000
   }
 }));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files - PUBLIC mappen (uden login)
+app.use(express.static(path.join(__dirname, 'MinDisApp2025', 'public')));
 
 // Root route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/auth/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// 🔴 BESKYTTEDE ROUTES
-app.get('/forside.html', (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login.html');
-  }
-  res.sendFile(path.join(__dirname, 'disprojekt2025','protected', 'forside.html'));
-});
-
-app.get('/forside', (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login.html');
-  }
-  res.sendFile(path.join(__dirname, 'disprojekt2025','protected', 'forside.html'));
-});
-
-// 🔴 ROUTE FOR RODEN (/)
-app.get('/', (req, res) => {
   if (req.session.user) {
+    // Hvis bruger er logget ind, redirect til beskyttet forside
     return res.redirect('/forside');
   }
-  res.sendFile(path.join(__dirname, 'disprojekt2025', 'public', 'index.html'));
+  // Hvis ikke logget ind, vis index.html (login side)
+  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'public', 'index.html'));
 });
 
+// Login route
+app.get('/login', (req, res) => {
+  if (req.session.user) {
+    // Hvis allerede logget ind, redirect til forside
+    return res.redirect('/forside');
+  }
+  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'public', 'login.html'));
+});
+
+// 🔴 BESKYTTET: Forside (kræver login)
+app.get('/forside', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'protected', 'forside.html'));
+});
+
+// 🔴 BESKYTTET: Forside.html (alternativ URL)
+app.get('/forside.html', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'MinDisApp2025', 'protected', 'forside.html'));
+});
 
 app.get('/health', (req, res) => {
   res.json({ 
