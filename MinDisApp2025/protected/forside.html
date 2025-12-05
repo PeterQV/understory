@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forside - Chat</title>
+    <link rel="stylesheet" href="/stylesheets/forside.css">
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            Du er logget ind som bruger: <span id="brugernavnDisplay">...</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Log ud</button>
+    </div>
+    
+    <div class="chatbotcontainer">
+        <h1 id="AIvelkommen">🤖 Hej! Jeg er Understory Chatbot</h1>
+        <div id="chatMessages" class="chat-messages">
+            <div class="message ai-message">
+                 Hej! Jeg er Understory's chatbot. Jeg er her for at hjælpe dig med spørgsmål om kundeoplevelser, feedback og hvordan Understory kan hjælpe din virksomhed. Hvad kan jeg hjælpe med?
+            </div>
+        </div>
+        <div class="chatinput">
+            <input type="text" id="messageinput" placeholder="Skriv din besked her ...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+<script>
+    // Vis brugernavn når siden loader
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/auth/user')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ikke logget ind');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.user) {
+                    document.getElementById('brugernavnDisplay').textContent = data.user.brugernavn || data.user.fornavn || 'Bruger';
+                }
+            })
+            .catch(error => {
+                console.error('Fejl ved hentning af bruger:', error);
+                window.location.href = '/login.html';
+            });
+    });
+
+    function sendMessage() {
+        const input = document.getElementById('messageinput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+
+        // Tilføj brugerens besked til chatten
+        addMessage(message, 'user');
+        input.value = '';
+        input.disabled = true;
+
+        // Vis "skriver..." besked
+        const typingIndicator = addMessage('Skriver...', 'ai');
+        typingIndicator.id = 'typing-indicator';
+
+        // Send til serveren
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(async response => {
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
+            return data;
+        })
+        .then(data => {
+            // Fjern "skriver..." besked
+            const typingElement = document.getElementById('typing-indicator');
+            if (typingElement) {
+                typingElement.remove();
+            }
+
+            if (data.reply) {
+                addMessage(data.reply, 'ai');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Fjern "skriver..." besked
+            const typingElement = document.getElementById('typing-indicator');
+            if (typingElement) {
+                typingElement.remove();
+            }
+            
+            let errorMessage = 'Der opstod en fejl';
+            
+            if (error.message.includes('429')) {
+                errorMessage = 'For mange anmodninger. Vent venligst 15 minutter.';
+            } else if (error.message.includes('509')) {
+                errorMessage = 'API grænse overskredet. Prøv igen i morgen.';
+            } else if (error.message.includes('401')) {
+                errorMessage = 'Session udløbet. Log venligst ind igen.';
+                setTimeout(() => window.location.href = '/login.html', 2000);
+            }
+            
+            addMessage('Fejl: ' + errorMessage, 'error');
+        })
+        .finally(() => {
+            input.disabled = false;
+            input.focus();
+        });
+    }
+
+    function addMessage(text, sender) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        messageDiv.textContent = text;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return messageDiv;
+    }
+
+    // Tillad Enter-tasten til at sende besked
+    document.getElementById('messageinput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function logout() {
+        fetch('/auth/logout', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/login.html';
+            }
+        })
+        .catch(error => {
+            console.error('Logout fejl:', error);
+            window.location.href = '/login.html';
+        });
+    }
+</script>
+</body>
+</html>
