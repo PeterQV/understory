@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
-// Support both connect-redis v9 (default export) and older versions (function taking session)
+// Support både connect-redis v9 (default export) og ældre der returnerer en factory
 const connectRedis = require('connect-redis');
 const { createClient } = require('redis');
 // i app.js eller bin/www
@@ -29,9 +29,14 @@ redisClient.on('error', (err) => console.error('Redis client error', err));
 redisClient.connect().catch((err) => console.error('Redis connect error', err));
 
 // Fallback så vi kan køre både ny og gammel connect-redis
-const RedisStore = connectRedis.default
-  ? connectRedis.default
-  : connectRedis(session);
+let RedisStore;
+if (typeof connectRedis === 'function' && !connectRedis.default) {
+  // Ældre version: require('connect-redis')(session)
+  RedisStore = connectRedis(session);
+} else {
+  // Nyere version: default export er selve store-klassen
+  RedisStore = connectRedis.default || connectRedis;
+}
 
 // Trust proxy for nginx
 app.set('trust proxy', 1);
