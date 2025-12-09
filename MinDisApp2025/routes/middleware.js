@@ -3,10 +3,10 @@ var router = express.Router();
 
 /* simpel middleware der tjekker om cookie eksisterer */
 const middleware = async (req, res, next) => {
-    if (req.cookies.myCookie == 'cookieValue') {
+    if (req.cookies['connect.sid']) {
         next();
     } else {
-        res.json({ message: 'No middleware route access!' });
+        res.json({ message: 'No session cookie!' });
     }
 }
 
