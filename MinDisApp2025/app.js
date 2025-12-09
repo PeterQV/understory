@@ -17,7 +17,7 @@ var authRouter = require('./routes/auth');
 var chatRouter = require('./routes/deepseek');
 var app = express();
 
-// Redis client til delte sessions på tværs af PM2 cluster workers
+// Redis client til delete sessions på tværs af PM2 cluster workers
 const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
   socket: {
