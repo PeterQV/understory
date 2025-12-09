@@ -27,7 +27,7 @@ const getUser = async (username) => {
 const displayCurrentUser = async () => {
   const el = document.getElementById('brugernavnDisplay');
   if (!el) return;
-  
+
   try {
     const response = await fetch('/auth/user');
     if (response.ok) {
@@ -203,8 +203,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-  req.session.user = {
-  username: user.username,
-  email: user.email,
-};
