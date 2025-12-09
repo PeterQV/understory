@@ -25,6 +25,10 @@ const getUser = async (username) => {
 // Vis brugernavn på forsiden når siden loader
 const displayCurrentUser = async () => {
   const el = document.getElementById('brugernavnDisplay');
+  req.session.user = {
+  username: user.username,
+  email: user.email,
+};
   if (!el) return;
   
   try {
