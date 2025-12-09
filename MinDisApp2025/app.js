@@ -4,7 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
-const RedisStore = require('connect-redis').default;
+// Support both connect-redis v9 (default export) and older versions (function taking session)
+const connectRedis = require('connect-redis');
 const { createClient } = require('redis');
 // i app.js eller bin/www
 require('dotenv').config();
@@ -26,6 +27,11 @@ const redisClient = createClient({
 
 redisClient.on('error', (err) => console.error('Redis client error', err));
 redisClient.connect().catch((err) => console.error('Redis connect error', err));
+
+// Fallback så vi kan køre både ny og gammel connect-redis
+const RedisStore = connectRedis.default
+  ? connectRedis.default
+  : connectRedis(session);
 
 // Trust proxy for nginx
 app.set('trust proxy', 1);
