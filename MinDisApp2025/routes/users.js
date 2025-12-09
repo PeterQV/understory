@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const users = require('../db/brugere');
-const { requireAuth } = require('./middleware');
+
+// Simple session-guard middleware til at beskytte /users endpoints
+const requireAuth = (req, res, next) => {
+  if (req.session && req.session.user) return next();
+  return res.status(401).json({ success: false, message: 'Ikke logget ind' });
+};
 
 // Gælder for alle routes under /users
 router.use(requireAuth);
