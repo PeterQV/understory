@@ -16,4 +16,5 @@ router.get('/', middleware, async (req, res) => {
     res.json({ message: 'Cookie found!', cookies: req.cookies.myCookie });
 });
 
+
 module.exports = router;
