@@ -120,10 +120,15 @@ const authController = {
 
   // GET CURRENT USER
   getCurrentUser: (req, res) => {
+    console.log('Session user:', req.session.user);
     if (req.session.user) {
+      // Returner alle relevante felter, inkl. username og email
       res.json({ 
         success: true,
-        user: req.session.user 
+        user: {
+          username: req.session.user.username || null,
+          email: req.session.user.email || null
+        }
       });
     } else {
       res.status(401).json({ 

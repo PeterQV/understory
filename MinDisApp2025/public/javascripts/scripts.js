@@ -22,16 +22,17 @@ const getUser = async (username) => {
   }
 }
 
+
 // Vis brugernavn på forsiden når siden loader
 const displayCurrentUser = async () => {
   const el = document.getElementById('brugernavnDisplay');
   if (!el) return;
-  
+
   try {
     const response = await fetch('/auth/user');
     if (response.ok) {
       const data = await response.json();
-      el.textContent = data.user?.brugernavn || data.user?.email || 'Bruger'; // Vis brugernavn eller email
+      el.textContent = data.user?.username || data.user?.email || 'Bruger'; // Vis brugernavn eller email
     } else {
       el.textContent = 'Ikke logget ind';
       // Redirect til login hvis på beskyttet side

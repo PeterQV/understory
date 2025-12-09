@@ -52,7 +52,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Simple session - uden Redis (for nu)
+
 app.use(session({
   store: new RedisStore({
     client: redisClient,
@@ -71,11 +71,6 @@ app.use(session({
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Root route
-/*app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});*/
 
 app.get('/auth/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
@@ -118,7 +113,7 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRouter);
 app.use('/api', chatRouter);
 app.use('/users', usersRouter);
-app.use('/middleware', require('./routes/middleware'));
+//app.use('/middleware', require('./routes/middleware'));
 
 // 404 handler
 app.use(function(req, res, next) {
