@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
+const RedisStore = require('connect-redis').default;
+const { createClient } = require('redis');
 // i app.js eller bin/www
 require('dotenv').config();
 
@@ -13,6 +15,17 @@ var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var chatRouter = require('./routes/deepseek');
 var app = express();
+
+// Redis client til delte sessions på tværs af PM2 cluster workers
+const redisClient = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  socket: {
+    reconnectStrategy: (retries) => Math.min(retries * 50, 2000)
+  }
+});
+
+redisClient.on('error', (err) => console.error('Redis client error', err));
+redisClient.connect().catch((err) => console.error('Redis connect error', err));
 
 // Trust proxy for nginx
 app.set('trust proxy', 1);
@@ -25,12 +38,17 @@ app.use(cookieParser());
 
 // Simple session - uden Redis (for nu)
 app.use(session({
+  store: new RedisStore({
+    client: redisClient,
+    prefix: process.env.REDIS_PREFIX || 'sess:'
+  }),
   secret: process.env.SESSION_SECRET || 'default-secret-change-me',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: true, // Sæt til true når du har HTTPS
+    secure: process.env.COOKIE_SECURE === 'true' || process.env.NODE_ENV === 'production',
+    sameSite: process.env.COOKIE_SAMESITE || 'lax',
     maxAge: 30 * 60 * 1000
   }
 }));
