@@ -52,7 +52,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Simple session - uden Redis (for nu)
+
 app.use(session({
   store: new RedisStore({
     client: redisClient,
@@ -71,11 +71,6 @@ app.use(session({
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Root route
-/*app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});*/
 
 app.get('/auth/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
