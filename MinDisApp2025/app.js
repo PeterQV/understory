@@ -30,12 +30,17 @@ redisClient.connect().catch((err) => console.error('Redis connect error', err));
 
 // Fallback så vi kan køre både ny og gammel connect-redis
 let RedisStore;
-if (typeof connectRedis === 'function' && !connectRedis.default) {
+if (connectRedis && typeof connectRedis === 'function' && !connectRedis.default) {
   // Ældre version: require('connect-redis')(session)
   RedisStore = connectRedis(session);
+} else if (connectRedis && typeof connectRedis.default === 'function') {
+  // Nyere version CommonJS import med default export
+  RedisStore = connectRedis.default;
+} else if (connectRedis && typeof connectRedis.RedisStore === 'function') {
+  // Eventuel named export
+  RedisStore = connectRedis.RedisStore;
 } else {
-  // Nyere version: default export er selve store-klassen
-  RedisStore = connectRedis.default || connectRedis;
+  throw new Error('connect-redis: kunne ikke finde en gyldig RedisStore constructor');
 }
 
 // Trust proxy for nginx
