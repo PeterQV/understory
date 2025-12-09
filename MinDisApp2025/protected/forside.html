@@ -107,7 +107,7 @@
                 errorMessage = 'API grænse overskredet. Prøv igen i morgen.';
             } else if (error.message.includes('401')) {
                 errorMessage = 'Session udløbet. Log venligst ind igen.';
-                setTimeout(() => window.location.href = '/login.html', 2000);
+                setTimeout(() => window.location.href = '/index.html', 2000);
             }
             
             addMessage('Fejl: ' + errorMessage, 'error');
@@ -145,7 +145,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.href = '/login.html';
+                window.location.href = '/index.html';
             }
         })
         .catch(error => {
