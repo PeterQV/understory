@@ -1,19 +1,5 @@
-/*var express = require('express');
-var router = express.Router();
 
-
-const middleware = async (req, res, next) => {
-    if (req.cookies['connect.sid']) {
-        next();
-    } else {
-        res.json({ message: 'No session cookie!' });
-    }
-}
-
-
-router.get('/', middleware, async (req, res) => {
-    res.json({ message: 'Cookie found!', cookies: req.cookies.myCookie });
-});
-
-
-module.exports = router;*/
+module.exports = function requireAuth(req, res, next) {
+  if (req.session && req.session.user) return next();
+  return res.status(401).json({ success: false, message: 'Ikke logget ind' });
+};
