@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
   displayCurrentUser();
 });
 
-const setCookie = async () => {
+/*const setCookie = async () => {
   try {
     const response = await fetch("/cookie/set");
     const data = await response.json();
@@ -114,7 +114,7 @@ const getCookie = async () => {
   } catch (error) {
     console.error('Error getting cookie:', error);
   }
-}
+}*/
 
 // Login form håndtering
 const setupLoginForm = () => {
