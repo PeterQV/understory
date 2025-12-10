@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var rateLimit = require('express-rate-limit');
 var session = require('express-session');
 // Support både connect-redis v9 (default export) og ældre der returnerer en factory
 const connectRedis = require('connect-redis');
@@ -52,6 +53,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Simpel IP-baseret rate limit for at dæmpe brute-force/spam.
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'For mange requests, prøv igen senere' }
+});
+app.use(limiter);
 
 app.use(session({
   store: new RedisStore({
@@ -134,5 +144,6 @@ const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 module.exports = app;
