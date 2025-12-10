@@ -12,7 +12,7 @@ require('dotenv').config();
 
 
 // Routes
-var usersRouter = require('./routes/users');
+//var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var chatRouter = require('./routes/deepseek');
 var app = express();
