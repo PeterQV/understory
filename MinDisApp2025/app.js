@@ -112,7 +112,7 @@ app.get('/health', (req, res) => {
 // Use routers
 app.use('/auth', authRouter);
 app.use('/api', chatRouter);
-app.use('/users', usersRouter);
+//app.use('/users', usersRouter);
 //app.use('/middleware', require('./routes/middleware'));
 
 // 404 handler

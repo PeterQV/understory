@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const users = require('../db/brugere');
 
@@ -11,7 +11,7 @@ const requireAuth = (req, res, next) => {
 // Gælder for alle routes under /users
 router.use(requireAuth);
 
-/* GET brugere ud fra brugernavn */
+// GET brugere ud fra brugernavn 
 router.get('/:username', async (req, res) => {
   const username = req.params.username;
   const user = users.find((u) => u.username === username);
@@ -23,7 +23,7 @@ router.get('/:username', async (req, res) => {
   res.json(user);
 });
 
-/* POST lav en ny bruger */
+// POST lav en ny bruger 
 router.post('/create', async (req, res) => {
   const newUser = req.body;
   users.push(newUser);
@@ -31,11 +31,11 @@ router.post('/create', async (req, res) => {
 });
 
 /* GET alle brugere (kun username og email) */
-router.get('/', (req, res) => {
+/*router.get('/', (req, res) => {
   res.json(users.map(u => ({ username: u.username, password: u.password, email: u.email })));
-});
+});*/
 
-/* PUT opdater bruger ud fra brugernavn */
+// PUT opdater bruger ud fra brugernavn 
 /*router.put('/update/:username', async (req, res) => {
     const username = req.params.username;
     const updatedData = req.body;
@@ -62,4 +62,4 @@ router.get('/', (req, res) => {
     res.json({ message: 'User deleted!' });
 });
 */
-module.exports = router;
+//module.exports = router;

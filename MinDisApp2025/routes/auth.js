@@ -10,7 +10,7 @@ router.post('/logout', authController.logout);
 router.get('/user', authController.getCurrentUser);
 
 // Debug routes (valgfrie)
-router.get('/debug/users', authController.getAllUsers);
+router.get('/users', authController.getAllUsers);
 router.post('/hash-passwords', authController.hashAllPasswords);
 
 module.exports = router;
