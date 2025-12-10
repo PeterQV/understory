@@ -77,7 +77,7 @@ app.get('/auth/login', (req, res) => {
 });
 
 // 🔴 BESKYTTEDE ROUTES
-app.get('/forside.html',requireAuth, (req, res) => {
+app.get('/forside.html', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login.html');
   }
@@ -113,9 +113,7 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRouter);
 app.use('/api', chatRouter);
 //app.use('/users', usersRouter);
-app.use('/middleware', require('./routes/middleware'));
-
-const requireAuth = require('./routes/middleware');
+//app.use('/middleware', require('./routes/middleware'));
 
 // 404 handler
 app.use(function(req, res, next) {

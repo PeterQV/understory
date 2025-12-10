@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController'); 
-const requireAuth = require('../middleware/requireAuth');  // middlware oprettet
+//const requireAuth = require('../middleware/requireAuth');  // middlware oprettet
 
 // Definer endpoints
 router.post('/login', authController.login);
@@ -11,7 +11,7 @@ router.post('/logout', authController.logout);
 router.get('/user', authController.getCurrentUser);
 
 // Debug routes (valgfrie)
-router.get('/users', requireAuth, authController.getAllUsers); // middlware oprettet
+router.get('/users', authController.getAllUsers); // middlware oprettet
 router.post('/hash-passwords', authController.hashAllPasswords);
 
 module.exports = router;
