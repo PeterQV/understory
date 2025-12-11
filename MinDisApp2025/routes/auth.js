@@ -10,7 +10,7 @@ router.post('/register', authController.register);
 router.post('/logout', authController.logout);
 router.get('/user', authController.getCurrentUser);
 
-// Debug routes (valgfrie)
+
 router.get('/users',requireAuth, authController.getAllUsers); // middlware oprettet
 router.post('/hash-passwords', authController.hashAllPasswords);
 
