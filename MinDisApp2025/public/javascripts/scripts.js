@@ -92,31 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
   displayCurrentUser();
 });
 
-/*const setCookie = async () => {
-  try {
-    const response = await fetch("/cookie/set");
-    const data = await response.json();
-    console.log(response);
-    console.log(data);
-    alert(data.message);
-  } catch (error) {
-    console.error('Error setting cookie:', error);
-  }
-}
-
-const getCookie = async () => {
-  try {
-    const response = await fetch("/cookie/get");
-    const data = await response.json();
-    console.log(response);
-    console.log(data);
-    alert(data.message);
-  } catch (error) {
-    console.error('Error getting cookie:', error);
-  }
-}*/
-
-// Login form håndtering
 const setupLoginForm = () => {
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {

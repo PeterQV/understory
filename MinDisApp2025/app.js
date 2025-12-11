@@ -13,7 +13,6 @@ require('dotenv').config();
 
 
 // Routes
-//var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var chatRouter = require('./routes/deepseek');
 var app = express();
@@ -122,7 +121,7 @@ app.get('/health', (req, res) => {
 // Use routers
 app.use('/auth', authRouter);
 app.use('/api', chatRouter);
-//app.use('/users', usersRouter);
+
 
 // 404 handler
 app.use(function(req, res, next) {
